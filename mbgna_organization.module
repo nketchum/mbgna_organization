@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * @file
+ * Provides an organization entity type.
+ */
+
+use Drupal\Core\Render\Element;
+use Drupal\mbgna_organization\Entity\Organization;
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function mbgna_organization_theme() {
+  return [
+    'organization' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Prepares variables for organization templates.
+ *
+ * Default template: organization.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the organization information and any
+ *     fields attached to the entity.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_organization(array &$variables) {
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function mbgna_organization_user_cancel($edit, UserInterface $account, $method) {
+  switch ($method) {
+    case 'user_cancel_block_unpublish':
+      // Unpublish organizations.
+      $storage = \Drupal::entityTypeManager()->getStorage('organization');
+      $organization_ids = $storage->getQuery()
+        ->condition('uid', $account->id())
+        ->condition('status', 1)
+        ->execute();
+      foreach ($storage->loadMultiple($organization_ids) as $organization) {
+        $organization->set('status', FALSE);
+        $organization->save();
+      }
+      break;
+
+    case 'user_cancel_reassign':
+      // Anonymize organizations.
+      $storage = \Drupal::entityTypeManager()->getStorage('organization');
+      $organization_ids = $storage->getQuery()
+        ->condition('uid', $account->id())
+        ->execute();
+      foreach ($storage->loadMultiple($organization_ids) as $organization) {
+        $organization->setOwnerId(0);
+        $organization->save();
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_predelete() for user entities.
+ */
+function mbgna_organization_user_predelete(UserInterface $account) {
+  // Delete organizations.
+  $storage = \Drupal::entityTypeManager()->getStorage('organization');
+  $organization_ids = $storage->getQuery()
+    ->condition('uid', $account->id())
+    ->execute();
+  $organizations = $storage->loadMultiple($organization_ids);
+  $storage->delete($organizations);
+}

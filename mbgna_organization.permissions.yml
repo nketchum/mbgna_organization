@@ -1,0 +1,12 @@
+administer organization types:
+  title: 'Administer organization types'
+  description: 'Maintain the types of organization entity.'
+  restrict access: true
+delete organization:
+  title: Delete organization
+create organization:
+  title: Create organization
+view organization:
+  title: View organization
+edit organization:
+  title: Edit organization

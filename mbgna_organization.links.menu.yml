@@ -1,0 +1,11 @@
+entity.organization_type.collection:
+  title: 'Organization types'
+  description: 'Manage and CRUD actions on Organization type.'
+  parent: system.admin_structure
+  route_name: entity.organization_type.collection
+
+entity.organization.collection:
+  title: 'Organizations'
+  route_name: view.organizations.page_1
+  description: 'Browse organizations'
+  parent: system.admin_content

@@ -6,6 +6,6 @@ entity.organization_type.collection:
 
 entity.organization.collection:
   title: 'Organizations'
-  route_name: view.organizations.page_1
+  route_name: view.organization.page_1
   description: 'Browse organizations'
   parent: system.admin_content
